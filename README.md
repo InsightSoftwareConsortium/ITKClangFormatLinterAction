@@ -1,5 +1,24 @@
-# Container Action Template
+# ITK clang-format linter action
 
-To get started, click the `Use this template` button on this repository [which will create a new repository based on this template](https://github.blog/2019-06-06-generate-new-repositories-with-repository-templates/).
+This GitHub Action checks consistent of the pushed source code with ITK's Coding Style as
+specified by its .clang-format style configuration file.
 
-For info on how to build your first Container action, see the [toolkit docs folder](https://github.com/actions/toolkit/blob/master/docs/container-action.md).
+## Usage
+
+Add the following configuration to your project's repository at, e.g.,  *.github/workflows/clang-format-linter.yml*.
+
+```yml
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@master
+```
+
+The linter check will fail on a pull request if style changes are required.
