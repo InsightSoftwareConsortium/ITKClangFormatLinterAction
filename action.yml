@@ -2,11 +2,11 @@ name: 'ITK clang-format linter'
 description: 'Check for consistency with ITK Coding Style'
 author: 'Matt McCormick'
 inputs:
-  errorMessage:
+  error-message:
     description: 'Error message when style changes are required.'
     default: 'Code is inconsistent with ITK Coding Style.'
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.errorMessage }}
+    - ${{ inputs.error-message }}
