@@ -22,3 +22,15 @@ jobs:
 ```
 
 The linter check will fail on a pull request if style changes are required.
+
+## See Also
+
+When used with
+[ITKApplyClangFormatAction](https://github.com/InsightSoftwareConsortium/ITKApplyClangFormatAction),
+a custom error can be provided,
+
+```yml
+    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@master
+      with:
+        error-message: 'Code is inconsistent with ITK Coding Style. Add the *action:ApplyClangFormat* PR label to correct.'
+```
