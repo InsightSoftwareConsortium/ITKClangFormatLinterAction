@@ -2,12 +2,14 @@
 
 set -euo pipefail
 
+error_message="$1"
+
 cd "$GITHUB_WORKSPACE"
 
 cp /ITK.clang-format ./.clang-format
 /clang-format.bash --tracked
 if ! git diff-index --diff-filter=M --quiet HEAD -- ':!.clang-format'; then
-  echo "::error ::Code is inconsistent with ITK's Coding Style."
+  echo "::error ::${error_message}"
   echo ""
   echo "Changes required:"
   echo ""
