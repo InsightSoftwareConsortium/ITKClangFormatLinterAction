@@ -8,7 +8,7 @@ specified by its .clang-format style configuration file.
 Add the following configuration to your project's repository at, e.g.,  *.github/workflows/clang-format-linter.yml*.
 
 ```yml
-on: [push]
+on: [push,pull_request]
 
 jobs:
   lint:
