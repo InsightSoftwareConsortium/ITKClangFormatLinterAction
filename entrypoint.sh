@@ -4,6 +4,8 @@ set -euo pipefail
 
 error_message="$1"
 
+git config --global --add safe.directory /github/workspace
+
 cd "$GITHUB_WORKSPACE"
 
 if ! test -f ./.clang-format; then
