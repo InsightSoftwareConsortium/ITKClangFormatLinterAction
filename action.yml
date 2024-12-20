@@ -5,8 +5,12 @@ inputs:
   error-message:
     description: 'Error message when style changes are required.'
     default: 'Code is inconsistent with ITK Coding Style.'
+  itk-branch:
+    description: 'The Git branch of the ITK repository to fetch .clang-format from.'
+    default: 'master'
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - ${{ inputs.error-message }}
+    - ${{ inputs.itk-branch }}
