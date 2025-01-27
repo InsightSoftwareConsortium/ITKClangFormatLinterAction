@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 RUN wget https://apt.llvm.org/llvm.sh \
     && chmod +x llvm.sh \
     && ./llvm.sh 19 \
-    && apt-get install clang-format-19 \
+    && apt-get install -y clang-format-19 \
     && apt-get clean
 
 # The following is a workaround to allow other scripts
