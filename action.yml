@@ -7,7 +7,7 @@ inputs:
     default: 'Code is inconsistent with ITK Coding Style.'
   itk-branch:
     description: 'The Git branch of the ITK repository to fetch .clang-format from.'
-    default: 'release'
+    default: 'v6.0a02'
 runs:
   using: 'docker'
   image: 'Dockerfile'
