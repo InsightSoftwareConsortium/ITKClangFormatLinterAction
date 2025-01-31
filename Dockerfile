@@ -5,6 +5,7 @@ COPY LICENSE README.md /
 RUN apt-get update && apt-get install -y \
   git \
   wget \
+  curl \
   lsb-release \
   software-properties-common \
   gnupg \
