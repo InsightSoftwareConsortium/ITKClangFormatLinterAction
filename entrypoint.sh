@@ -16,6 +16,7 @@ if test $itk_branch = "master" -o $itk_branch = "main"; then
   # Use the same version of clang-format as used by ITK with its configuration
   wget https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${itk_branch}/.pre-commit-config.yaml -O ./ITK.pre-commit-config.yaml
   clang_format_version=$(grep -A 1 "mirrors-clang-format" ./ITK.pre-commit-config.yaml | tail -n 1 | cut -d: -f2 | tr -d ' v')
+  touch ${HOME}/.bashrc # The ~/.bashrc file must exist for pixi to initialize properly https://github.com/prefix-dev/pixi/pull/3051
   curl -fsSL https://pixi.sh/install.sh | bash
   export PATH=$HOME/.pixi/bin:$PATH
   pixi init
