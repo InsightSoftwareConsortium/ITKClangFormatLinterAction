@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 error_message="$1"
 itk_branch="$2"
@@ -18,7 +19,7 @@ if test $itk_branch = "master" -o $itk_branch = "main"; then
   clang_format_version=$(grep -A 1 "mirrors-clang-format" ./ITK.pre-commit-config.yaml | tail -n 1 | cut -d: -f2 | tr -d ' v')
   curl -fsSL https://pixi.sh/install.sh | bash
   export PATH=$HOME/.pixi/bin:$PATH
-  pixi init
+  pixi init ..
   pixi add python
   pixi add --pypi clang-format==$clang_format_version
   export PATH=$PWD/.pixi/envs/default/bin:$PATH
