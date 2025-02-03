@@ -15,9 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
+    - uses: actions/checkout@v4
     - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@master
 ```
 
