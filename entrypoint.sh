@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 error_message="$1"
 itk_branch="$2"
@@ -19,7 +20,7 @@ if test $itk_branch = "master" -o $itk_branch = "main"; then
   touch ${HOME}/.bashrc # The ~/.bashrc file must exist for pixi to initialize properly https://github.com/prefix-dev/pixi/pull/3051
   curl -fsSL https://pixi.sh/install.sh | bash
   export PATH=$HOME/.pixi/bin:$PATH
-  pixi init
+  pixi init ..
   pixi add python
   pixi add --pypi clang-format==$clang_format_version
   export PATH=$PWD/.pixi/envs/default/bin:$PATH
