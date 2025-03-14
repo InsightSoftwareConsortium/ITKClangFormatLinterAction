@@ -23,6 +23,7 @@ if test $itk_branch != "release-5.4" -a $itk_branch != "release"; then
   pixi init ..
   pixi add python
   pixi add --pypi clang-format==$clang_format_version
+  export PATH=$PWD/../.pixi/envs/default/bin:$PATH
   export PATH=$PWD/.pixi/envs/default/bin:$PATH
   export PATH=/.pixi/envs/default/bin:$PATH
 fi
