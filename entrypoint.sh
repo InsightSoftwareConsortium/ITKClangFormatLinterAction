@@ -13,7 +13,7 @@ cd "$GITHUB_WORKSPACE"
 # Fetch the .clang-format file from the specified branch
 wget https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${itk_branch}/.clang-format -O /ITK.clang-format
 
-if test $itk_branch = "master" -o $itk_branch = "main"; then
+if test $itk_branch != "release-5.4" -a $itk_branch != "release"; then
   # Use the same version of clang-format as used by ITK with its configuration
   wget https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${itk_branch}/.pre-commit-config.yaml -O ./ITK.pre-commit-config.yaml
   clang_format_version=$(grep -A 1 "mirrors-clang-format" ./ITK.pre-commit-config.yaml | tail -n 1 | cut -d: -f2 | tr -d ' v')
