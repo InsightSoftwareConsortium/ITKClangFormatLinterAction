@@ -21,8 +21,7 @@ if test $itk_branch != "release-5.4" -a $itk_branch != "release"; then
   curl -fsSL https://pixi.sh/install.sh | bash
   export PATH=$HOME/.pixi/bin:$PATH
   pixi init ..
-  pixi add python
-  pixi add --pypi clang-format==$clang_format_version
+  pixi global install clang-format==$clang_format_version
   export PATH=$PWD/../.pixi/envs/default/bin:$PATH
   export PATH=$PWD/.pixi/envs/default/bin:$PATH
   export PATH=/.pixi/envs/default/bin:$PATH
