@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@master
+    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@main
 ```
 
 The linter check will fail on a pull request if style changes are required.
@@ -28,7 +28,7 @@ When used with
 a custom error can be provided,
 
 ```yml
-    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@master
+    - uses: InsightSoftwareConsortium/ITKClangFormatLinterAction@main
       with:
         error-message: 'Code is inconsistent with ITK Coding Style. Add the *action:ApplyClangFormat* PR label to correct.'
 ```
