@@ -9,8 +9,105 @@ inputs:
     description: 'The Git branch of the ITK repository to fetch .clang-format from.'
     default: 'main'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.error-message }}
-    - ${{ inputs.itk-branch }}
+  using: 'composite'
+  steps:
+    - name: Determine clang-format version
+      id: config
+      shell: bash
+      run: |
+        set -euo pipefail
+        ITK_BRANCH="${{ inputs.itk-branch }}"
+
+        if [[ "${ITK_BRANCH}" != "release-5.4" && "${ITK_BRANCH}" != "release" ]]; then
+          curl --retry 3 --retry-delay 30 -fsSL \
+            "https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${ITK_BRANCH}/.pre-commit-config.yaml" \
+            -o ITK.pre-commit-config.yaml
+          CLANG_FORMAT_VERSION=$(grep -A 1 "mirrors-clang-format" ITK.pre-commit-config.yaml | tail -n 1 | cut -d: -f2 | tr -d ' v')
+          rm -f ITK.pre-commit-config.yaml
+          if [[ -z "${CLANG_FORMAT_VERSION}" ]]; then
+            echo "::error::Unable to determine clang-format version from ITK .pre-commit-config.yaml for branch '${ITK_BRANCH}'."
+            exit 1
+          fi
+          if ! [[ "${CLANG_FORMAT_VERSION}" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "::error::Invalid clang-format version '${CLANG_FORMAT_VERSION}' parsed from .pre-commit-config.yaml for branch '${ITK_BRANCH}'."
+            exit 1
+          fi
+          echo "clang_format_version=${CLANG_FORMAT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "use_pixi=true" >> "$GITHUB_OUTPUT"
+          echo "use_pip=false" >> "$GITHUB_OUTPUT"
+          echo "Detected clang-format version: ${CLANG_FORMAT_VERSION}"
+        else
+          # For release-5.4/release branches, install clang-format 8 via pip.
+          # clang-format 8.x is not available in conda-forge (pixi) but is
+          # available on PyPI as a prebuilt binary wheel.
+          echo "clang_format_version=8.0.1" >> "$GITHUB_OUTPUT"
+          echo "use_pixi=false" >> "$GITHUB_OUTPUT"
+          echo "use_pip=true" >> "$GITHUB_OUTPUT"
+          echo "Using pip clang-format 8.0.1 for ${ITK_BRANCH} branch"
+        fi
+
+    - name: Install pixi
+      if: steps.config.outputs.use_pixi == 'true'
+      uses: prefix-dev/setup-pixi@v0.9.4
+      with:
+        run-install: false
+
+    - name: Install clang-format via pixi
+      if: steps.config.outputs.use_pixi == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        pixi global install "clang-format==${{ steps.config.outputs.clang_format_version }}"
+        echo "$HOME/.pixi/bin" >> "$GITHUB_PATH"
+
+    - name: Install clang-format via pip
+      if: steps.config.outputs.use_pip == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        python3 -m pip install "clang-format==${{ steps.config.outputs.clang_format_version }}"
+
+    - name: Verify clang-format
+      shell: bash
+      run: |
+        echo "clang-format location: $(which clang-format)"
+        clang-format --version
+
+    - name: Fetch ITK clang-format configuration
+      shell: bash
+      run: |
+        set -euo pipefail
+        ITK_BRANCH="${{ inputs.itk-branch }}"
+
+        # Use the module's own .clang-format if present, otherwise fetch from ITK
+        if ! test -f ./.clang-format; then
+          echo "Downloading ITK .clang-format from ${ITK_BRANCH}"
+          curl --retry 3 --retry-delay 30 -fsSL \
+            "https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${ITK_BRANCH}/.clang-format" \
+            -o .clang-format
+        fi
+
+        # Fetch the clang-format runner script
+        curl --retry 3 --retry-delay 30 -fsSL \
+          "https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/${ITK_BRANCH}/Utilities/Maintenance/clang-format.bash" \
+          -o clang-format.bash
+        chmod +x ./clang-format.bash
+
+    - name: Run clang-format check
+      shell: bash
+      run: |
+        set -euo pipefail
+        ./clang-format.bash --tracked
+        if ! git diff-index --diff-filter=M --quiet HEAD -- ':!.clang-format'; then
+          echo "::error ::${{ inputs.error-message }}"
+          echo ""
+          echo "Changes required:"
+          echo ""
+          echo "Files:"
+          git diff-index --diff-filter=M --name-only HEAD -- ':!.clang-format'
+          echo ""
+          echo "Changes:"
+          git diff HEAD -- ':!.clang-format'
+          exit 1
+        fi
+        echo "clang-format ITK Coding Style check completed successfully."
