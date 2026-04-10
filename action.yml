@@ -66,6 +66,9 @@ runs:
       run: |
         set -euo pipefail
         python3 -m pip install "clang-format==${{ steps.config.outputs.clang_format_version }}"
+        # Ensure pip scripts directory is on PATH
+        PIP_SCRIPTS_DIR="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts"))')"
+        echo "${PIP_SCRIPTS_DIR}" >> "$GITHUB_PATH"
 
     - name: Verify clang-format
       shell: bash
