@@ -99,7 +99,7 @@ runs:
         set -euo pipefail
         ./clang-format.bash --tracked
         if ! git diff-index --diff-filter=M --quiet HEAD -- ':!.clang-format'; then
-          echo "::error ::${{ inputs.error-message }}"
+          echo "::error::${{ inputs.error-message }}"
           echo ""
           echo "Changes required:"
           echo ""
