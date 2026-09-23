@@ -21,6 +21,20 @@ jobs:
 
 The linter check will fail on a pull request if style changes are required.
 
+Only files whose `hooks.style` Git attribute includes `clangformat` are checked, so the repository
+needs a *.gitattributes* file that marks its C and C++ sources, as ITK's does:
+
+```
+[attr]our-c-style  whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,clangformat
+
+*.c    our-c-style
+*.h    our-c-style
+*.cxx  our-c-style
+*.hxx  our-c-style
+```
+
+The check fails if no tracked file has this attribute, since there would be nothing to check.
+
 ## See Also
 
 When used with

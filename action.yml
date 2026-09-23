@@ -100,6 +100,27 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+
+        # clang-format.bash only formats tracked files whose hooks.style Git
+        # attribute includes "clangformat", as set in .gitattributes. When no
+        # file matches, it runs "clang-format -i" with no file arguments, which
+        # prints "cannot use -i when reading from stdin" but exits 0, so the
+        # check would pass without having checked anything. Fail instead.
+        file_count=$(git ls-files | git check-attr --stdin hooks.style \
+          | grep -e 'hooks.style: .*clangformat' | grep -v 'ThirdParty' | wc -l || true)
+        if [[ "${file_count}" -eq 0 ]]; then
+          echo "::error::No tracked files have the hooks.style=clangformat Git attribute, so there is nothing to check."
+          echo ""
+          echo "Mark the sources to check in a .gitattributes file at the repository root, for example:"
+          echo ""
+          echo "  [attr]our-c-style  whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,clangformat"
+          echo "  *.h    our-c-style"
+          echo "  *.hxx  our-c-style"
+          echo "  *.cxx  our-c-style"
+          exit 1
+        fi
+        echo "Checking ${file_count} files with the hooks.style=clangformat Git attribute."
+
         ./clang-format.bash --tracked
         if ! git diff-index --diff-filter=M --quiet HEAD -- ':!.clang-format'; then
           echo "::error::${{ inputs.error-message }}"
